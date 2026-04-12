@@ -95,6 +95,12 @@ export function menuPrint() {
   const id=state.menuOsId; closeOSMenu(); if(id) printOS(id);
 }
 
+export function menuEdit() {
+  const id = state.menuOsId;
+  closeOSMenu();
+  if (id) window.loadOSForEdit(id);
+}
+
 export function menuChangeStatus() {
   const id = state.menuOsId;
   closeOSMenu();
