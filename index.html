@@ -30,6 +30,10 @@
 <!-- Estilos -->
 <link rel="stylesheet" href="./styles.css">
 <style>
+  @media (max-width: 640px) {
+    #dash-bottom-row { grid-template-columns: 1fr !important; }
+  }
+
   /* Role-based visibility */
   .hidden-role { display: none !important; }
 
@@ -37,18 +41,7 @@
   .status-aprovado  { background: rgba(59,158,90,0.15);  color: #3B9E5A; }
   .status-reprovado { background: rgba(226,75,74,0.12);  color: #E24B4A; }
 
-  /* Dashboard cards */
-  .dash-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .dash-card  { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-  .dash-card .dc-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
-  .dash-card .dc-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); }
-  .dash-card.dc-amber .dc-value { color: var(--amber); }
-  .dash-card.dc-blue  .dc-value { color: var(--info); }
-  .dash-card.dc-green .dc-value { color: var(--success); }
-  .dash-card.dc-red   .dc-value { color: var(--danger); }
 
-  .chart-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; height: 320px; }
-  .dash-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
   /* Status modal */
   .status-opt {
@@ -569,24 +562,16 @@
 <!-- DASHBOARD PAGE -->
 <div id="page-dashboard" class="page">
 <div class="container">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-    <div>
-      <div class="section-title" style="margin-bottom:3px">Dashboard</div>
-      <p style="color:var(--text3);font-size:13px">Visão gerencial das ordens de serviço</p>
-    </div>
-  </div>
 
-  <div class="dash-filters">
-    <div class="field" style="margin:0">
-      <label style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:5px;display:block">Ano</label>
-      <select id="dash-year" onchange="renderDashboard()"
-        style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;-webkit-appearance:none">
-      </select>
+  <!-- Header dashboard -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);letter-spacing:0.02em">Visão Gerencial</div>
+      <div style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:2px">Caution Tech · Assistência Técnica</div>
     </div>
-    <div class="field" style="margin:0">
-      <label style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:5px;display:block">Mês</label>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <select id="dash-month" onchange="renderDashboard()"
-        style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;-webkit-appearance:none">
+        style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none">
         <option value="all">Todos os meses</option>
         <option value="0">Janeiro</option><option value="1">Fevereiro</option>
         <option value="2">Março</option><option value="3">Abril</option>
@@ -595,43 +580,102 @@
         <option value="8">Setembro</option><option value="9">Outubro</option>
         <option value="10">Novembro</option><option value="11">Dezembro</option>
       </select>
+      <select id="dash-year" onchange="renderDashboard()"
+        style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none">
+      </select>
     </div>
   </div>
 
-  <div class="dash-cards">
-    <div class="dash-card dc-amber">
-      <div class="dc-label">Total de OS</div>
-      <div class="dc-value" id="dash-total">0</div>
+  <!-- Linha 1: financeiro destaque -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+
+    <div style="background:linear-gradient(135deg,#1A1916 0%,#221f1a 100%);border:1px solid rgba(245,166,35,0.3);border-radius:12px;padding:20px 22px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(245,166,35,0.06)"></div>
+      <div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:0.15em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px">Receita · Finalizadas</div>
+      <div id="dash-receita" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--amber)">R$ 0,00</div>
     </div>
-    <div class="dash-card dc-blue">
-      <div class="dc-label">Aguardando Orçamento</div>
-      <div class="dc-value" id="dash-aguardando">0</div>
+
+    <div style="background:linear-gradient(135deg,#1A1916 0%,#1a201a 100%);border:1px solid rgba(59,158,90,0.3);border-radius:12px;padding:20px 22px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(59,158,90,0.06)"></div>
+      <div style="font-size:10px;font-weight:700;color:#3B9E5A;letter-spacing:0.15em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px">Orçado · Aprovadas</div>
+      <div id="dash-orcado" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#3B9E5A">R$ 0,00</div>
     </div>
-    <div class="dash-card dc-green">
-      <div class="dc-label">Aprovadas</div>
-      <div class="dc-value" id="dash-aprovado">0</div>
-    </div>
-    <div class="dash-card dc-red">
-      <div class="dc-label">Reprovadas</div>
-      <div class="dc-value" id="dash-reprovado">0</div>
-    </div>
-    <div class="dash-card">
-      <div class="dc-label">Finalizadas</div>
-      <div class="dc-value" id="dash-finalizado">0</div>
-    </div>
-    <div class="dash-card dc-amber">
-      <div class="dc-label">Receita (Finaliz.)</div>
-      <div class="dc-value" style="font-size:18px" id="dash-receita">R$ 0,00</div>
-    </div>
-    <div class="dash-card dc-green">
-      <div class="dc-label">Valor Orçado (Aprovado)</div>
-      <div class="dc-value" style="font-size:18px" id="dash-orcado">R$ 0,00</div>
-    </div>
+
   </div>
 
-  <div class="chart-wrap">
-    <canvas id="dash-chart"></canvas>
+  <!-- Linha 2: cards de contagem com sparkbars -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px" id="dash-count-row">
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Total OS</span>
+        <span style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text)" id="dash-total">0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Conversão</span>
+        <span style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text)" id="dash-conv">0%</span>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid rgba(58,143,212,0.3);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span style="font-size:10px;color:#3A8FD4;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Aguardando</span>
+        <span style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:#3A8FD4" id="dash-aguardando">0</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div id="spark-aguardando" style="height:100%;background:#3A8FD4;border-radius:2px;width:0%;transition:width 0.6s ease"></div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid rgba(59,158,90,0.3);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span style="font-size:10px;color:#3B9E5A;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Aprovado</span>
+        <span style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:#3B9E5A" id="dash-aprovado">0</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div id="spark-aprovado" style="height:100%;background:#3B9E5A;border-radius:2px;width:0%;transition:width 0.6s ease"></div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid rgba(226,75,74,0.3);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span style="font-size:10px;color:#E24B4A;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Reprovado</span>
+        <span style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:#E24B4A" id="dash-reprovado">0</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div id="spark-reprovado" style="height:100%;background:#E24B4A;border-radius:2px;width:0%;transition:width 0.6s ease"></div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid rgba(245,166,35,0.3);border-radius:10px;padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span style="font-size:10px;color:var(--amber);font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase">Finalizado</span>
+        <span style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:var(--amber)" id="dash-finalizado">0</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+        <div id="spark-finalizado" style="height:100%;background:var(--amber);border-radius:2px;width:0%;transition:width 0.6s ease"></div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Linha 3: gráfico + recentes -->
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:12px;margin-bottom:20px" id="dash-bottom-row">
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:14px">OS por Mês</div>
+      <div style="height:240px">
+        <canvas id="dash-chart"></canvas>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:4px">Mais Recentes</div>
+      <div id="dash-recent"></div>
+    </div>
+
+  </div>
+
 </div>
 </div>
 
