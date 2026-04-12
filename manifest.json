@@ -1,0 +1,37 @@
+{
+  "name": "Caution Tech — Ordem de Serviço",
+  "short_name": "CautionOS",
+  "description": "Sistema de Ordens de Serviço — Caution Tech Assistência Técnica",
+  "start_url": "/CautionOrder/index.html",
+  "scope": "/CautionOrder/",
+  "display": "standalone",
+  "background_color": "#0F0E0D",
+  "theme_color": "#F5A623",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/doo0fzoef/image/upload/w_192,h_192,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/doo0fzoef/image/upload/w_512,h_512,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/doo0fzoef/image/upload/w_512,h_512,c_pad,b_rgb:0F0E0D,bo_77px_solid_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Nova OS",   "url": "/CautionOrder/index.html#nova-os" },
+    { "name": "Histórico", "url": "/CautionOrder/index.html#historico" }
+  ]
+}
