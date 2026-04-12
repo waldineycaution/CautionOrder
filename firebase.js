@@ -92,6 +92,10 @@ export async function fbSaveOrder(os) {
 export async function fbUpdateOrderStatus(firestoreId, status) {
   await updateDoc(doc(db, 'orders', firestoreId), { status });
 }
+export async function fbUpdateOrder(firestoreId, data) {
+  const { createdAt, ...clean } = data; // não sobrescreve timestamp original
+  await setDoc(doc(db, 'orders', firestoreId), clean, { merge: true });
+}
 export async function fbDeleteOrder(firestoreId) {
   await deleteDoc(doc(db, 'orders', firestoreId));
 }
