@@ -27,15 +27,17 @@ export function renderDashboard() {
   const aprovado    = filtered.filter(o=>o.status==='aprovado').length;
   const reprovado   = filtered.filter(o=>o.status==='reprovado').length;
   const finalizado  = filtered.filter(o=>o.status==='finalizado').length;
-  const receitaTotal = filtered.filter(o=>o.status==='finalizado').reduce((s,o)=>s+(o.total||0),0);
+  const receitaFinalizada = filtered.filter(o=>o.status==='finalizado').reduce((s,o)=>s+(parseFloat(o.total)||0),0);
+  const receitaAprovada   = filtered.filter(o=>o.status==='aprovado').reduce((s,o)=>s+(parseFloat(o.total)||0),0);
 
   // Cards
-  setCard('dash-total',      total,       '');
-  setCard('dash-aguardando', aguardando,  '');
-  setCard('dash-aprovado',   aprovado,    '');
-  setCard('dash-reprovado',  reprovado,   '');
-  setCard('dash-finalizado', finalizado,  '');
-  setCard('dash-receita',    'R$ '+receitaTotal.toFixed(2).replace('.',','), '');
+  setCard('dash-total',      total);
+  setCard('dash-aguardando', aguardando);
+  setCard('dash-aprovado',   aprovado);
+  setCard('dash-reprovado',  reprovado);
+  setCard('dash-finalizado', finalizado);
+  setCard('dash-receita',    'R$ '+receitaFinalizada.toFixed(2).replace('.',','));
+  setCard('dash-orcado',     'R$ '+receitaAprovada.toFixed(2).replace('.',','));
 
   // Gráfico mensal
   renderChart(yearOrders, selYear);
