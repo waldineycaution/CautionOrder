@@ -162,6 +162,14 @@
     </div>
   </div>
 
+  <!-- Banner modo edição -->
+  <div id="edit-mode-banner" style="display:none;align-items:center;gap:12px;background:rgba(58,143,212,0.12);border:1px solid var(--info);border-radius:8px;padding:10px 16px;margin-bottom:16px">
+    <span style="font-size:16px">✎</span>
+    <span id="edit-os-label" style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--info);font-weight:600"></span>
+    <span style="font-size:12px;color:var(--text3);margin-left:4px">— Você está editando esta OS. Salve para confirmar as alterações.</span>
+    <button onclick="clearForm()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:5px;color:var(--text3);font-size:12px;padding:4px 10px;cursor:pointer;font-family:'IBM Plex Mono',monospace" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Cancelar edição</button>
+  </div>
+
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap">
     <div>
       <div class="os-num-display" id="os-number-display">OS #0001</div>
@@ -740,6 +748,9 @@
   </div>
   <button onclick="menuPrint()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;transition:background 0.12s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
     <span style="font-size:15px">⎙</span> Imprimir OS
+  </button>
+  <button onclick="menuEdit()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--info);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;transition:background 0.12s" onmouseover="this.style.background='rgba(58,143,212,0.08)'" onmouseout="this.style.background='none'">
+    <span style="font-size:15px">✎</span> Editar OS
   </button>
   <button onclick="menuChangeStatus()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--amber);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;transition:background 0.12s" onmouseover="this.style.background='rgba(245,166,35,0.08)'" onmouseout="this.style.background='none'">
     <span style="font-size:15px">↺</span> Alterar Status
