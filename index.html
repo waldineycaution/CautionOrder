@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Caution Tech — Ordem de Serviço</title>
+<meta name="application-name" content="CautionOS">
+<meta name="description" content="Sistema de Ordens de Serviço — Caution Tech Assistência Técnica">
+<meta name="theme-color" content="#F5A623">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CautionOS">
+
+<!-- PWA Icons para iOS -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_180,h_180,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_152,h_152,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_120,h_120,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_32,h_32,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_192,h_192,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-startup-image" href="https://res.cloudinary.com/doo0fzoef/image/upload/w_512,h_512,c_pad,b_rgb:0F0E0D/v1775270575/caution-tech_egsnfy.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="./manifest.json">
+
+<!-- Fontes -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Estilos -->
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:#0F0E0D;z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:380px">
+    <div style="text-align:center;margin-bottom:32px">
+      <img src="https://res.cloudinary.com/doo0fzoef/image/upload/v1775270575/caution-tech_egsnfy.png"
+           alt="Caution Tech" style="height:64px;width:auto;margin-bottom:16px"
+           onerror="this.style.display='none'">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#F5A623;letter-spacing:0.06em;text-transform:uppercase">Caution Tech</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5C5952;letter-spacing:0.15em;text-transform:uppercase;margin-top:4px">Assistência Técnica · Sistema OS</div>
+    </div>
+
+    <div style="background:#1A1916;border:1px solid #2E2C28;border-radius:12px;padding:28px 24px">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#9E9A92;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px">Acesso ao Sistema</div>
+
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+        <label style="font-size:10px;font-weight:600;color:#5C5952;letter-spacing:0.12em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace">E-mail</label>
+        <input id="login-email" type="email" inputmode="email" autocomplete="email"
+               placeholder="seu@email.com"
+               style="background:#242220;border:1px solid #2E2C28;border-radius:7px;color:#F0EDE8;font-family:'IBM Plex Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;-webkit-appearance:none;transition:border-color 0.15s"
+               onfocus="this.style.borderColor='#F5A623'" onblur="this.style.borderColor='#2E2C28'">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:20px">
+        <label style="font-size:10px;font-weight:600;color:#5C5952;letter-spacing:0.12em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace">Senha</label>
+        <input id="login-pass" type="password" autocomplete="current-password"
+               placeholder="••••••••"
+               style="background:#242220;border:1px solid #2E2C28;border-radius:7px;color:#F0EDE8;font-family:'IBM Plex Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;-webkit-appearance:none;transition:border-color 0.15s"
+               onfocus="this.style.borderColor='#F5A623'" onblur="this.style.borderColor='#2E2C28'">
+      </div>
+
+      <div id="login-error" style="font-size:12px;color:#E24B4A;font-family:'IBM Plex Mono',monospace;margin-bottom:14px;min-height:16px"></div>
+
+      <button id="login-btn" onclick="doLogin()"
+              style="width:100%;background:#F5A623;color:#0F0E0D;border:none;border-radius:8px;padding:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.06em;cursor:pointer;transition:background 0.15s;-webkit-tap-highlight-color:transparent"
+              onmouseover="this.style.background='#C47D0A'" onmouseout="this.style.background='#F5A623'">
+        Entrar
+      </button>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#3D3A34">
+      Caution Tech · Sistema interno
+    </div>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="app-root" style="display:none">
+<!-- Offline badge -->
+<div id="offline-badge">SEM CONEXÃO</div>
+
+<!-- Install Banner -->
+<div id="install-banner">
+  <div class="install-text">Instale o <strong>CautionOS</strong> no seu dispositivo para acesso rápido!</div>
+  <button id="btn-install" onclick="installApp()">Instalar</button>
+  <button id="btn-dismiss-install" onclick="dismissInstall()">×</button>
+</div>
+
+<div class="header">
+  <div class="logo">
+    <img src="https://res.cloudinary.com/doo0fzoef/image/upload/v1775270575/caution-tech_egsnfy.png"
+         alt="Caution Tech"
+         onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
+    <div id="logo-fallback" style="display:none;width:36px;height:36px;background:rgba(245,166,35,0.15);border:1.5px solid #F5A623;border-radius:6px;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:900;color:#F5A623;font-size:16px;">!</div>
+    <div class="logo-info">
+      <div class="logo-text">Caution Tech</div>
+      <div class="logo-sub">Assistência Técnica</div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('nova-os')">Nova OS</button>
+    <button class="nav-btn" onclick="showPage('tecnicos')">Técnicos</button>
+    <button class="nav-btn" onclick="showPage('historico')">Histórico <span class="os-counter" id="hist-count">(0)</span></button>
+    <span id="user-email" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5C5952;margin-left:8px"></span>
+    <button class="nav-btn" onclick="doLogout()" style="color:#E24B4A;margin-left:4px" title="Sair">Sair</button>
+  </div>
+</div>
+
+<!-- NOVA OS PAGE -->
+<div id="page-nova-os" class="page active">
+<div class="container">
+
+  <!-- Cabeçalho de impressão — visível APENAS no print -->
+  <div class="print-header" style="display:none">
+    <img src="https://res.cloudinary.com/doo0fzoef/image/upload/v1775270575/caution-tech_egsnfy.png"
+         alt="Caution Tech" style="height:44px;width:auto">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16pt;color:#C47D0A;letter-spacing:0.06em;text-transform:uppercase">Caution Tech</div>
+      <div style="font-size:8pt;color:#888;letter-spacing:0.12em;text-transform:uppercase;font-family:monospace">Assistência Técnica · (11) 97684-8946</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div id="print-os-num" style="font-family:monospace;font-size:16pt;font-weight:700;color:#C47D0A">OS #0001</div>
+      <div id="print-os-date" style="font-family:monospace;font-size:9pt;color:#888"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap">
+    <div>
+      <div class="os-num-display" id="os-number-display">OS #0001</div>
+      <div class="os-date-display" id="os-date-display"></div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-secondary" onclick="clearForm()">Limpar</button>
+      <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
+      <button class="btn btn-primary" onclick="saveOS()">✓ Salvar OS</button>
+    </div>
+  </div>
+
+  <div class="section-title">Dados do Cliente</div>
+  <div class="card">
+    <div style="margin-bottom:12px">
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="cli-nome" placeholder="Nome do cliente" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid-4 keep-2" style="margin-bottom:12px">
+      <div class="field col-span-3">
+        <label>Endereço</label>
+        <input type="text" id="cli-end" placeholder="Rua, complemento" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Nº</label>
+        <input type="text" id="cli-num" placeholder="Nº">
+      </div>
+    </div>
+    <div class="grid-4 keep-2" style="margin-bottom:12px">
+      <div class="field col-span-2">
+        <label>Cidade</label>
+        <input type="text" id="cli-cidade" placeholder="Cidade">
+      </div>
+      <div class="field">
+        <label>UF</label>
+        <input type="text" id="cli-uf" placeholder="SP" maxlength="2" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label>CEP</label>
+        <input type="text" id="cli-cep" placeholder="00000-000" maxlength="9">
+      </div>
+    </div>
+    <div class="grid-3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Telefone</label>
+        <input type="tel" id="cli-tel" placeholder="(11) 0000-0000">
+      </div>
+      <div class="field">
+        <label>Celular</label>
+        <input type="tel" id="cli-cel" placeholder="(11) 90000-0000">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="cli-email" placeholder="email@exemplo.com">
+      </div>
+    </div>
+    <div class="grid-2 keep-2">
+      <div class="field">
+        <label>RG</label>
+        <input type="text" id="cli-rg" placeholder="RG">
+      </div>
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" id="cli-cpf" placeholder="000.000.000-00" maxlength="14">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Atendimento</div>
+  <div class="card">
+    <div class="grid-3">
+      <div class="field">
+        <label>Técnico Responsável</label>
+        <select id="sel-tecnico"><option value="">-- Selecionar --</option></select>
+      </div>
+      <div class="field">
+        <label>Atendente</label>
+        <input type="text" id="atendente" placeholder="Nome do atendente">
+      </div>
+      <div class="field">
+        <label>Data de Entrada</label>
+        <input type="date" id="data-entrada">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Produto para Reparo</div>
+  <div class="card">
+    <div class="grid-2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Tipo de Produto</label>
+        <select id="prod-tipo">
+          <option value="">Selecionar tipo...</option>
+          <option>Smartphone</option>
+          <option>Tablet</option>
+          <option>Notebook</option>
+          <option>Smartwatch</option>
+          <option>Fone de ouvido</option>
+          <option>Console</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fabricante</label>
+        <input type="text" id="prod-fab" list="fabricantes-list" placeholder="Ex: Samsung, Apple...">
+        <datalist id="fabricantes-list">
+          <option value="Samsung"><option value="Apple"><option value="Motorola">
+          <option value="Xiaomi"><option value="LG"><option value="Huawei">
+          <option value="Sony"><option value="Nokia"><option value="Positivo">
+        </datalist>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Modelo</label>
+        <input type="text" id="prod-modelo" placeholder="Ex: Galaxy S21...">
+      </div>
+      <div class="field">
+        <label>N/S ou IMEI</label>
+        <input type="text" id="prod-imei" placeholder="Número de série / IMEI" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Cor</label>
+        <input type="text" id="prod-cor" placeholder="Ex: Preto, Azul...">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Condições Gerais do Aparelho</div>
+  <div class="card">
+    <div class="conditions-grid" style="margin-bottom:14px">
+      <div class="cond-item">
+        <span class="cond-label">Aparelho liga?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'liga','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'liga','nao')">Não</button>
+        </div>
+      </div>
+      <div class="cond-item">
+        <span class="cond-label">Riscos / avarias físicas?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'riscos','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'riscos','nao')">Não</button>
+        </div>
+      </div>
+      <div class="cond-item">
+        <span class="cond-label">Tela trincada / quebrada?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'tela','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'tela','nao')">Não</button>
+        </div>
+      </div>
+      <div class="cond-item">
+        <span class="cond-label">Passou por outra assistência?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'assist','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'assist','nao')">Não</button>
+        </div>
+      </div>
+      <div class="cond-item">
+        <span class="cond-label">Acessórios entregues?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'acess','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'acess','nao')">Não</button>
+          <button class="cond-btn na" onclick="setCondition(this,'acess','na')">N/A</button>
+        </div>
+      </div>
+      <div class="cond-item">
+        <span class="cond-label">Carregador entregue?</span>
+        <div class="cond-btns">
+          <button class="cond-btn yes" onclick="setCondition(this,'carregador','sim')">Sim</button>
+          <button class="cond-btn no" onclick="setCondition(this,'carregador','nao')">Não</button>
+          <button class="cond-btn na" onclick="setCondition(this,'carregador','na')">N/A</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Outras observações físicas</label>
+      <textarea id="cond-obs" placeholder="Descreva outras condições observadas no produto..."></textarea>
+    </div>
+  </div>
+
+  <div class="section-title">Senha do Aparelho</div>
+  <div class="card">
+    <div class="toggle-row" onclick="toggleSenha()" style="margin-bottom:0">
+      <span class="toggle-label">O aparelho possui senha?</span>
+      <div class="toggle-switch" id="senha-toggle"></div>
+    </div>
+    <div class="password-section" id="senha-section">
+      <div class="password-tabs">
+        <button class="pw-tab active" onclick="setPwMode('text')">Numérica / Texto</button>
+        <button class="pw-tab" onclick="setPwMode('pattern')">Padrão de Toque</button>
+        <button class="pw-tab" onclick="setPwMode('none')">Face ID / Digital</button>
+      </div>
+      <div class="pw-text-input visible" id="pw-text-wrap">
+        <div class="field">
+          <label>Senha informada pelo cliente</label>
+          <input type="text" id="pw-text" placeholder="Ex: 1234 ou senha@123" autocomplete="off">
+        </div>
+      </div>
+      <div class="canvas-wrap" id="pw-pattern-wrap">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:10px;font-family:'IBM Plex Mono',monospace">Toque nos pontos para registrar o padrão:</p>
+        <div class="pattern-grid" id="pattern-grid">
+          <canvas class="pattern-canvas" id="pattern-canvas" width="212" height="212"></canvas>
+        </div>
+        <div class="pw-actions">
+          <span class="pw-display" id="pattern-display">Padrão: —</span>
+          <button class="btn btn-secondary btn-sm" onclick="clearPattern()">Limpar</button>
+        </div>
+      </div>
+      <div class="pw-text-input" id="pw-none-wrap">
+        <div style="padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2);">
+          Desbloqueio biométrico — cliente deverá estar presente para autorizar acesso.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Defeito Declarado</div>
+  <div class="card">
+    <div class="field" style="margin-bottom:12px">
+      <label>Defeito relatado pelo cliente</label>
+      <textarea id="defeito" rows="4" placeholder="Ex: Tela não liga, bateria não carrega, câmera travando, queda d'água..."></textarea>
+    </div>
+    <div class="grid-2 keep-2">
+      <div class="field">
+        <label>Categoria do defeito</label>
+        <select id="defeito-cat">
+          <option value="">Selecionar...</option>
+          <option>Tela / Display</option>
+          <option>Bateria</option>
+          <option>Câmera</option>
+          <option>Carregamento / Conector</option>
+          <option>Software / Sistema</option>
+          <option>Alto-falante / Microfone</option>
+          <option>Botões</option>
+          <option>Chassi / Estrutura</option>
+          <option>Molhado / Oxidado</option>
+          <option>Sem sinal / Antena</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Urgência</label>
+        <select id="defeito-urgencia">
+          <option value="">Normal</option>
+          <option>Alta prioridade</option>
+          <option>Prioridade média</option>
+          <option>Baixa prioridade</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Peças e Serviços</div>
+  <div class="card">
+    <div class="services-wrap">
+      <table class="services-table" id="services-table">
+        <thead>
+          <tr>
+            <th style="width:58px">Qtd</th>
+            <th>Descrição de Peças / Serviços</th>
+            <th style="width:120px">Vl Unit R$</th>
+            <th style="width:120px">Vl Total R$</th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody id="services-body"></tbody>
+      </table>
+    </div>
+    <button class="add-row-btn" onclick="addServiceRow()">+ Adicionar item</button>
+    <div class="totals-row">
+      <span class="total-label">Subtotal</span>
+      <span class="total-value" id="subtotal-display">R$ 0,00</span>
+    </div>
+    <div class="totals-row">
+      <span class="total-label">Desconto</span>
+      <div class="total-value">
+        <input type="number" id="discount-input" placeholder="0,00" min="0" oninput="calcTotals()">
+      </div>
+    </div>
+    <div class="totals-row" style="border-top:2px solid var(--amber)">
+      <span class="total-label" style="color:var(--amber)">Total</span>
+      <span class="total-value grand-total" id="total-display">R$ 0,00</span>
+    </div>
+  </div>
+
+  <div class="pre-approved">
+    <label>Valor Pré-Aprovado R$</label>
+    <input type="number" id="pre-aprovado" placeholder="0,00" min="0" inputmode="decimal">
+  </div>
+
+  <div class="disclaimer">
+    NÃO NOS RESPONSABILIZAMOS POR DADOS CONTIDOS NO HD, MEMÓRIA INTERNA OU CARTÃO SD. DEFEITO/VÍCIO OCULTO QUE NÃO SE APLIQUE AO SERVIÇO PRESTADO. SUBSTITUIÇÃO DE DISPLAY CORRE O RISCO DE NÃO FUNCIONAMENTO DO LEITOR DE DIGITAL OU CÂMERA FRONTAL. TROCA DE TELA NÃO GERA GARANTIA EM OUTROS COMPONENTES. PRODUTO QUE CHEGOU NA LOJA SEM LIGAR SUJEITO A ANÁLISE PRÉVIA.
+    <br><br>Peças e serviços comercializados com <strong>90 dias de garantia</strong> para reparo no balcão (conforme Art. 26, Seção IV do Código de Defesa do Consumidor).
+  </div>
+
+  <div class="card">
+    <div class="card-title">Aprovação / Conclusão</div>
+    <div class="grid-3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Status da OS</label>
+        <select id="status-os">
+          <option value="aberta">Aberta</option>
+          <option value="aguardando">Aguardando Peça</option>
+          <option value="em_andamento">Em andamento</option>
+          <option value="concluida">Concluída</option>
+          <option value="entregue">Entregue</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Data Conclusão</label>
+        <input type="date" id="data-conclusao">
+      </div>
+      <div class="field">
+        <label>Data Retirada</label>
+        <input type="date" id="data-retirada">
+      </div>
+    </div>
+    <div class="field">
+      <label>Laudo Técnico / Observações de Conclusão</label>
+      <textarea id="laudo" placeholder="Descreva o serviço executado, peças trocadas e resultado final..."></textarea>
+    </div>
+  </div>
+
+  <div class="actions-bar" style="padding-bottom:16px">
+    <button class="btn btn-secondary" onclick="clearForm()">Limpar formulário</button>
+    <button class="btn btn-secondary" onclick="window.print()">Imprimir OS</button>
+    <button class="btn btn-primary" onclick="saveOS()">✓ Salvar Ordem de Serviço</button>
+  </div>
+</div>
+</div>
+
+<!-- TÉCNICOS PAGE -->
+<div id="page-tecnicos" class="page">
+<div class="container">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="section-title" style="margin-bottom:3px">Gerenciar Técnicos</div>
+      <p style="color:var(--text3);font-size:13px">Cadastre e gerencie os técnicos da loja</p>
+    </div>
+    <button class="btn btn-primary" onclick="openTechModal()">+ Novo Técnico</button>
+  </div>
+  <div class="tech-grid" id="tech-grid"></div>
+</div>
+</div>
+
+<!-- HISTÓRICO PAGE -->
+<div id="page-historico" class="page">
+<div class="container">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="section-title" style="margin-bottom:3px">Histórico de Ordens</div>
+      <p style="color:var(--text3);font-size:13px">Todas as ordens de serviço cadastradas</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="search-os" placeholder="Buscar cliente ou OS..."
+        style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;outline:none;width:200px;-webkit-appearance:none"
+        oninput="renderHistory()">
+      <select id="filter-status"
+        style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none"
+        onchange="renderHistory()">
+        <option value="">Todos os status</option>
+        <option value="aberta">Aberta</option>
+        <option value="aguardando">Aguardando Peça</option>
+        <option value="em_andamento">Em andamento</option>
+        <option value="concluida">Concluída</option>
+        <option value="entregue">Entregue</option>
+        <option value="cancelada">Cancelada</option>
+      </select>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="history-table" id="history-table">
+        <thead>
+          <tr>
+            <th>OS</th><th>Cliente</th><th>Produto</th><th>Técnico</th>
+            <th>Entrada</th><th>Status</th><th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="history-empty">
+      <div class="empty-icon">📋</div>
+      <p>Nenhuma OS cadastrada ainda.</p>
+      <p style="margin-top:6px;font-size:12px">Crie a primeira na aba Nova OS.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn active" id="mob-nova" onclick="showPage('nova-os')">
+    <span class="icon">📝</span>Nova OS
+  </button>
+  <button class="mobile-nav-btn" id="mob-tec" onclick="showPage('tecnicos')">
+    <span class="icon">👷</span>Técnicos
+  </button>
+  <button class="mobile-nav-btn" id="mob-hist" onclick="showPage('historico')">
+    <span class="icon">📋</span>Histórico
+  </button>
+</nav>
+
+<!-- MODAL TÉCNICO -->
+<div class="modal-overlay" id="tech-modal">
+  <div class="modal">
+    <div class="modal-title" id="tech-modal-title">Novo Técnico</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Nome completo</label>
+      <input type="text" id="tech-nome" placeholder="Nome do técnico">
+    </div>
+    <div class="grid-2 keep-2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="tech-tel" placeholder="(11) 00000-0000" inputmode="tel">
+      </div>
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="text" id="tech-wpp" placeholder="(11) 00000-0000" inputmode="tel">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Especialidade</label>
+      <input type="text" id="tech-esp" placeholder="Ex: Celular, Notebook, Placa Lógica...">
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Status</label>
+      <select id="tech-status">
+        <option value="ativo">Ativo</option>
+        <option value="inativo">Inativo</option>
+      </select>
+    </div>
+    <input type="hidden" id="tech-edit-id">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeTechModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTech()">Salvar Técnico</button>
+    </div>
+  </div>
+</div>
+
+<!-- Menu flutuante da OS -->
+<div id="os-menu" style="
+  display:none;
+  position:fixed;
+  z-index:400;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:10px;
+  padding:6px;
+  min-width:190px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  animation:menuPop 0.12s ease;
+">
+  <div id="os-menu-header" style="padding:8px 12px 8px;border-bottom:1px solid var(--border);margin-bottom:4px">
+    <div id="os-menu-id" style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--amber)"></div>
+    <div id="os-menu-name" style="font-size:12px;color:var(--text3);margin-top:2px"></div>
+  </div>
+  <button onclick="menuPrint()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;transition:background 0.12s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
+    <span style="font-size:15px">⎙</span> Imprimir OS
+  </button>
+  <button onclick="menuDelete()" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:var(--danger);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;transition:background 0.12s" onmouseover="this.style.background='rgba(226,75,74,0.08)'" onmouseout="this.style.background='none'">
+    <span style="font-size:15px">✕</span> Excluir OS
+  </button>
+</div>
+
+<style>
+@keyframes menuPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+</style>
+
+<div class="toast" id="toast"></div>
+
+<!-- App principal -->
+
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
