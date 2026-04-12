@@ -1,142 +1,155 @@
 import { state } from './state.js';
-import { fbSaveTech, fbDeleteTech, createTechAccount, setUserRole } from './firebase.js';
+import { fbDeleteOrder, fbUpdateOrderStatus } from './firebase.js';
 import { setLoading, showToast } from './ui.js';
+import { printOS } from './print.js';
 
-export function renderTechs() {
-  const grid = document.getElementById('tech-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  state.technicians.forEach(t => {
-    const initials = t.nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const perfilLabel = t.perfil === 'dono' ? '👑 Dono' : '🔧 Técnico';
-    const perfilColor = t.perfil === 'dono' ? '#F5A623' : '#3A8FD4';
-    const card = document.createElement('div');
-    card.className = 'tech-card';
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="tech-avatar">${initials}</div>
-        <div>
-          <div class="tech-name">${t.nome}</div>
-          <div style="display:flex;gap:6px;align-items:center;margin-top:3px">
-            <span class="tech-status ${t.status}">${t.status==='ativo'?'Ativo':'Inativo'}</span>
-            <span style="font-size:11px;color:${perfilColor};font-family:'IBM Plex Mono',monospace">${perfilLabel}</span>
-          </div>
-        </div>
-      </div>
-      <div class="tech-phone">📞 ${t.tel||'—'}</div>
-      ${t.wpp?`<div class="tech-phone">📱 ${t.wpp}</div>`:''}
-      ${t.email?`<div class="tech-phone" style="font-size:11px">✉️ ${t.email}</div>`:''}
-      <div class="tech-specialty">${t.esp||'—'}</div>
-      <div class="tech-actions">
-        <button class="btn btn-secondary btn-sm" onclick="editTech('${t.firestoreId}')">Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteTech('${t.firestoreId}')">Remover</button>
-      </div>
+// ========== LABELS E CORES ==========
+export const STATUS_LABEL = {
+  aguardando_orcamento: 'Aguardando Orçamento',
+  aprovado:   'Aprovado',
+  reprovado:  'Reprovado',
+  finalizado: 'Finalizado',
+  // legado
+  aberta:        'Aberta',
+  aguardando:    'Aguardando',
+  em_andamento:  'Em andamento',
+  concluida:     'Concluída',
+  entregue:      'Entregue',
+  cancelada:     'Cancelada',
+};
+
+export const STATUS_CLASS = {
+  aguardando_orcamento: 'status-aguardando',
+  aprovado:   'status-aprovado',
+  reprovado:  'status-reprovado',
+  finalizado: 'status-concluida',
+  aberta:        'status-aberta',
+  aguardando:    'status-aguardando',
+  em_andamento:  'status-aguardando',
+  concluida:     'status-concluida',
+  entregue:      'status-concluida',
+  cancelada:     'status-aberta',
+};
+
+// ========== RENDERIZAR HISTÓRICO ==========
+export function renderHistory() {
+  const search       = (document.getElementById('search-os')?.value||'').toLowerCase();
+  const statusFilter = document.getElementById('filter-status')?.value||'';
+  const tbody  = document.getElementById('history-body');
+  const empty  = document.getElementById('history-empty');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const filtered = state.orders.filter(o => {
+    const ms  = !search || o.cliente.nome.toLowerCase().includes(search) || o.id.toLowerCase().includes(search);
+    const mst = !statusFilter || o.status === statusFilter;
+    return ms && mst;
+  });
+
+  if (filtered.length === 0) { empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  filtered.forEach(o => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    const sc = STATUS_CLASS[o.status]||'status-aberta';
+    const sl = STATUS_LABEL[o.status]||o.status;
+    tr.innerHTML = `
+      <td style="font-family:'IBM Plex Mono',monospace;color:var(--amber)">${o.id}</td>
+      <td>${o.cliente.nome}</td>
+      <td style="color:var(--text3)">${[o.produto.fab,o.produto.modelo].filter(Boolean).join(' ')||'—'}</td>
+      <td>${o.tecnico}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${o.dataEntrada?new Date(o.dataEntrada+'T12:00:00').toLocaleDateString('pt-BR'):'—'}</td>
+      <td><span class="status-badge ${sc}">${sl}</span></td>
+      <td style="font-family:'IBM Plex Mono',monospace;color:var(--amber)">R$ ${(o.total||0).toFixed(2).replace('.',',')}</td>
     `;
-    grid.appendChild(card);
+    tr.addEventListener('click', e => openOSMenu(e, o.id));
+    tbody.appendChild(tr);
   });
 }
 
-export function renderTechSelect() {
-  const sel = document.getElementById('sel-tecnico');
-  if (!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">-- Selecionar técnico --</option>';
-  state.technicians.filter(t=>t.status==='ativo').forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.firestoreId; opt.textContent = t.nome;
-    if (cur===t.firestoreId) opt.selected=true;
-    sel.appendChild(opt);
-  });
+export function updateHistCount() {
+  const el = document.getElementById('hist-count');
+  if (el) el.textContent = '('+state.orders.length+')';
 }
 
-export function openTechModal(firestoreId=null) {
-  const isNew = !firestoreId;
-  document.getElementById('tech-modal-title').textContent = firestoreId ? 'Editar Técnico' : 'Novo Técnico';
-  document.getElementById('tech-edit-id').value = firestoreId||'';
-  document.getElementById('tech-pass-wrap').style.display = isNew ? 'flex' : 'none';
-  document.getElementById('tech-email-wrap').style.display = isNew ? 'flex' : 'none';
-  if (firestoreId) {
-    const t = state.technicians.find(x=>x.firestoreId===firestoreId);
-    document.getElementById('tech-nome').value   = t.nome;
-    document.getElementById('tech-tel').value    = t.tel||'';
-    document.getElementById('tech-wpp').value    = t.wpp||'';
-    document.getElementById('tech-esp').value    = t.esp||'';
-    document.getElementById('tech-perfil').value = t.perfil||'tecnico';
-    document.getElementById('tech-status').value = t.status;
-  } else {
-    ['tech-nome','tech-tel','tech-wpp','tech-esp','tech-email-field','tech-pass'].forEach(id=>{
-      document.getElementById(id).value='';
-    });
-    document.getElementById('tech-perfil').value  = 'tecnico';
-    document.getElementById('tech-status').value  = 'ativo';
-  }
-  document.getElementById('tech-modal').classList.add('open');
+// ========== MENU FLUTUANTE ==========
+export function openOSMenu(e, osId) {
+  e.stopPropagation();
+  state.menuOsId = osId;
+  const o = state.orders.find(x=>x.id===osId);
+  const menu = document.getElementById('os-menu');
+  document.getElementById('os-menu-id').textContent   = o.id;
+  document.getElementById('os-menu-name').textContent = o.cliente.nome;
+  const x = Math.min(e.clientX, window.innerWidth-220);
+  const y = Math.min(e.clientY+8, window.innerHeight-200);
+  menu.style.left=x+'px'; menu.style.top=y+'px'; menu.style.display='block';
 }
 
-export function closeTechModal() {
-  document.getElementById('tech-modal').classList.remove('open');
+export function closeOSMenu() {
+  document.getElementById('os-menu').style.display='none';
+  state.menuOsId=null;
 }
 
-export async function saveTech() {
-  const nome   = document.getElementById('tech-nome').value.trim();
-  const firestoreId = document.getElementById('tech-edit-id').value;
-  const isNew  = !firestoreId;
-  const perfil = document.getElementById('tech-perfil').value;
-
-  if (!nome) { alert('Informe o nome do técnico.'); return; }
-
-  const data = {
-    nome,
-    tel:    document.getElementById('tech-tel').value,
-    wpp:    document.getElementById('tech-wpp').value,
-    esp:    document.getElementById('tech-esp').value,
-    perfil,
-    status: document.getElementById('tech-status').value,
-  };
-
-  if (isNew) {
-    const email = document.getElementById('tech-email-field').value.trim();
-    const pass  = document.getElementById('tech-pass').value;
-    if (!email || !pass) { alert('Informe o e-mail e a senha de acesso.'); return; }
-    if (pass.length < 6)  { alert('A senha deve ter ao menos 6 caracteres.'); return; }
-    data.email = email;
-
-    setLoading(true, 'Criando conta de acesso...');
-    try {
-      const uid = await createTechAccount(email, pass);
-      await setUserRole(uid, perfil, email, nome);
-      await fbSaveTech({ ...data, uid });
-      closeTechModal();
-      showToast('Técnico cadastrado com acesso ao sistema!');
-    } catch(e) {
-      const msgs = {
-        'auth/email-already-in-use': 'Este e-mail já está em uso.',
-        'auth/invalid-email':        'E-mail inválido.',
-        'auth/weak-password':        'Senha muito fraca.',
-      };
-      alert(msgs[e.code] || 'Erro ao criar conta: ' + e.message);
-    }
-    setLoading(false);
-  } else {
-    setLoading(true, 'Salvando técnico...');
-    try {
-      await fbSaveTech({ firestoreId, ...data });
-      // Atualiza role se perfil mudou
-      const t = state.technicians.find(x=>x.firestoreId===firestoreId);
-      if (t?.uid) await setUserRole(t.uid, perfil, t.email||'', nome);
-      closeTechModal();
-      showToast('Técnico atualizado!');
-    } catch(e) { showToast('Erro ao salvar técnico.'); }
-    setLoading(false);
-  }
+export function menuPrint() {
+  const id=state.menuOsId; closeOSMenu(); if(id) printOS(id);
 }
 
-export async function deleteTech(firestoreId) {
-  if (!confirm('Remover este técnico?')) return;
-  setLoading(true, 'Removendo...');
-  try {
-    await fbDeleteTech(firestoreId);
-    showToast('Técnico removido.');
-  } catch(e) { showToast('Erro ao remover técnico.'); }
+export function menuChangeStatus() {
+  const id = state.menuOsId;
+  closeOSMenu();
+  if (!id) return;
+  const o = state.orders.find(x=>x.id===id);
+  openStatusModal(o);
+}
+
+export async function menuDelete() {
+  if (!state.menuOsId) return;
+  const o   = state.orders.find(x=>x.id===state.menuOsId);
+  const fid = o.firestoreId;
+  const osId= state.menuOsId;
+  closeOSMenu();
+  if (!confirm(`Excluir ${o.id} — ${o.cliente.nome}?\nEssa ação não pode ser desfeita.`)) return;
+  setLoading(true,'Excluindo OS...');
+  try { await fbDeleteOrder(fid); showToast(osId+' excluída.'); }
+  catch(e) { showToast('Erro ao excluir OS.'); }
   setLoading(false);
+}
+
+// ========== MODAL DE STATUS ==========
+function openStatusModal(o) {
+  const current = o.status||'aguardando_orcamento';
+  const modal = document.getElementById('status-modal');
+  document.getElementById('status-modal-os').textContent = o.id+' — '+o.cliente.nome;
+  // Marca o status atual
+  document.querySelectorAll('.status-opt').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.status===current);
+  });
+  modal.dataset.osId       = o.id;
+  modal.dataset.firestoreId = o.firestoreId;
+  modal.classList.add('open');
+}
+
+export function closeStatusModal() {
+  document.getElementById('status-modal').classList.remove('open');
+}
+
+export async function saveStatus() {
+  const modal     = document.getElementById('status-modal');
+  const selected  = document.querySelector('.status-opt.selected');
+  if (!selected) { alert('Selecione um status.'); return; }
+  const fid    = modal.dataset.firestoreId;
+  const status = selected.dataset.status;
+  setLoading(true,'Atualizando status...');
+  try {
+    await fbUpdateOrderStatus(fid, status);
+    showToast('Status atualizado!');
+    closeStatusModal();
+  } catch(e) { showToast('Erro ao atualizar status.'); }
+  setLoading(false);
+}
+
+export function selectStatusOpt(btn) {
+  document.querySelectorAll('.status-opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
 }
