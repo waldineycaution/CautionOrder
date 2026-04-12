@@ -9,10 +9,10 @@ import {
   addServiceRow, calcRow, removeRow, calcTotals
 } from './ui.js';
 import { renderTechs, renderTechSelect, openTechModal, closeTechModal, saveTech, deleteTech } from './technicians.js';
-import { saveOS, clearForm } from './orders.js';
+import { saveOS, clearForm, loadOSForEdit } from './orders.js';
 import {
   renderHistory, updateHistCount,
-  openOSMenu, closeOSMenu, menuPrint, menuChangeStatus, menuDelete,
+  openOSMenu, closeOSMenu, menuPrint, menuEdit, menuChangeStatus, menuDelete,
   closeStatusModal, saveStatus, selectStatusOpt
 } from './history.js';
 import { printOS } from './print.js';
@@ -203,8 +203,10 @@ window.saveTech       = saveTech;
 window.deleteTech     = deleteTech;
 window.saveOS         = saveOS;
 window.clearForm      = clearForm;
+window.loadOSForEdit  = loadOSForEdit;
 window.openOSMenu     = openOSMenu;
 window.menuPrint      = menuPrint;
+window.menuEdit       = menuEdit;
 window.menuChangeStatus = menuChangeStatus;
 window.menuDelete     = menuDelete;
 window.closeStatusModal = closeStatusModal;
