@@ -8,4 +8,8 @@ export const state = {
   senhaActive: false,
   deferredInstallPrompt: null,
   menuOsId: null,
+  // Usuário logado
+  userRole: null,   // 'dono' | 'tecnico'
+  userId: null,
+  userEmail: null,
 };
