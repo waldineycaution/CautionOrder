@@ -1,11 +1,10 @@
 import { state } from './state.js';
-import { fbSaveTech, fbDeleteTech, createTechAccount, setUserRole } from './firebase.js';
+import { fbSaveTech, fbDeleteTech, createTechAccount, setUserRole, getNextTechNumber } from './firebase.js';
 import { setLoading, showToast } from './ui.js';
 
 // ========== GERAR CREDENCIAIS AUTO ==========
-function nextUserEmail() {
-  // Conta quantos técnicos já existem e gera o próximo email
-  const n = state.technicians.length + 1;
+async function nextUserEmail() {
+  const n = await getNextTechNumber();
   return `cautionuser${n}@caution.com`;
 }
 
@@ -59,7 +58,7 @@ export function renderTechSelect() {
 }
 
 // ========== MODAL ==========
-export function openTechModal(firestoreId=null) {
+export async function openTechModal(firestoreId=null) {
   const isNew = !firestoreId;
   document.getElementById('tech-modal-title').textContent = isNew ? 'Novo Técnico' : 'Editar Técnico';
   document.getElementById('tech-edit-id').value = firestoreId||'';
@@ -74,7 +73,7 @@ export function openTechModal(firestoreId=null) {
     document.getElementById('tech-perfil').value  = 'tecnico';
     document.getElementById('tech-status').value  = 'ativo';
     // Pré-preenche email automático (read-only)
-    const autoEmail = nextUserEmail();
+    const autoEmail = await nextUserEmail();
     const emailField = document.getElementById('tech-email-generated');
     if (emailField) emailField.textContent = autoEmail;
     document.getElementById('tech-email-hidden').value = autoEmail;
@@ -125,9 +124,17 @@ export async function saveTech() {
       const uid = await createTechAccount(email, password);
       await setUserRole(uid, perfil, email, nome);
       await fbSaveTech({ ...data, uid });
-
-      // Exibe confirmação com as credenciais
-      showCredConfirm(email, password, nome);
+      closeTechModal();
+      // Alert garantido — não pode ser perdido
+      setTimeout(() => {
+        alert(
+          '✅ Técnico cadastrado com sucesso!\n\n' +
+          '👤 Nome: ' + nome + '\n' +
+          '📧 E-mail: ' + email + '\n' +
+          '🔑 Senha: ' + password + '\n\n' +
+          'Anote essas informações e repasse ao técnico.'
+        );
+      }, 300);
       showToast('Técnico cadastrado!');
     } catch(e) {
       const msgs = {
