@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, doc,
   getDocs, getDoc, addDoc, setDoc, deleteDoc, updateDoc,
@@ -21,8 +21,12 @@ const firebaseConfig = {
   appId: "1:620268886285:web:ffad106d19d34b38a17844"
 };
 
-const app        = initializeApp(firebaseConfig);
-const secondApp  = initializeApp(firebaseConfig, 'secondary');
+const app = initializeApp(firebaseConfig);
+
+// App secundário para criar usuários sem deslogar o dono
+const existingApps = getApps();
+const secondApp    = existingApps.find(a => a.name === 'secondary') || initializeApp(firebaseConfig, 'secondary');
+
 export const db   = getFirestore(app);
 export const auth = getAuth(app);
 const authSecond  = getAuth(secondApp);
@@ -60,7 +64,14 @@ export async function createTechAccount(email, password) {
   return cred.user.uid;
 }
 
-// ========== CARREGAR DADOS ==========
+// ========== CONTADOR DE TÉCNICOS (evita emails duplicados) ==========
+export async function getNextTechNumber() {
+  const ref  = doc(db, 'settings', 'techCounter');
+  const snap = await getDoc(ref);
+  const next = snap.exists() ? (snap.data().count || 0) + 1 : 1;
+  await setDoc(ref, { count: next });
+  return next;
+}
 export async function fbLoadTechs() {
   const snap = await getDocs(collection(db, 'technicians'));
   state.technicians = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
