@@ -99,14 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let roleData = null;
     try {
-      // Verifica se é o primeiro usuário (vira dono automaticamente)
       if (await isFirstUser()) {
         await setUserRole(user.uid, 'dono', user.email, user.email.split('@')[0]);
         roleData = { role: 'dono' };
       } else {
-        roleData = await getUserRole(user.uid);
+        // Tenta até 3x com delay — garante que o token Firebase esteja propagado
+        for (let i = 0; i < 3; i++) {
+          roleData = await getUserRole(user.uid);
+          if (roleData) break;
+          await new Promise(r => setTimeout(r, 800));
+        }
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error('Erro ao buscar role:', e); }
 
     if (!roleData) {
       setLoading(false);
