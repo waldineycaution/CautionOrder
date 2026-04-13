@@ -92,7 +92,9 @@ export function openTechModal(firestoreId=null) {
 
 export function closeTechModal() {
   document.getElementById('tech-modal').classList.remove('open');
-  document.getElementById('tech-cred-confirm').style.display = 'none';
+  document.getElementById('tech-cred-confirm').style.display  = 'none';
+  document.getElementById('tech-form-fields').style.display   = 'block';
+  document.getElementById('tech-save-btn').style.display      = '';
 }
 
 // ========== CRUD ==========
