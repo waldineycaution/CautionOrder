@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, doc,
-  getDocs, addDoc, setDoc, deleteDoc, updateDoc,
+  getDocs, getDoc, addDoc, setDoc, deleteDoc, updateDoc,
   onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
@@ -40,9 +40,8 @@ export function onAuth(callback) {
 
 // ========== ROLES ==========
 export async function getUserRole(uid) {
-  const snap = await getDocs(collection(db, 'roles'));
-  const doc_ = snap.docs.find(d => d.id === uid);
-  return doc_ ? doc_.data() : null;
+  const snap = await getDoc(doc(db, 'roles', uid));
+  return snap.exists() ? snap.data() : null;
 }
 
 export async function setUserRole(uid, role, email, nome) {
